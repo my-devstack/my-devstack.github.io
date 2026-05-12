@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyDevStack — Local AWS Development, Visualized</title>
+  <meta name="description" content="MyDevStack is a modern, developer-friendly web interface for managing AWS services running locally via emulators like LocalStack and FloCi.">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
+              300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6',
+              600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af',
+              900: '#1e3a8a', 950: '#172554',
+            },
+            dark: {
+              bg: '#0f172a', surface: '#1e293b',
+              border: '#334155', text: '#f1f5f9', muted: '#94a3b8',
+            },
+            light: {
+              bg: '#f8fafc', surface: '#ffffff',
+              border: '#e2e8f0', text: '#0f172a', muted: '#64748b',
+            },
+            aws: {
+              s3: '#FF9900', lambda: '#FF9900', rds: '#FF9900',
+              elasticache: '#4053D6', iam: '#DD344C', cf: '#FF9900',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    .service-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .service-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+    .screenshot-img {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .screenshot-img:hover {
+      transform: scale(1.02);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up {
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+    .delay-100 { animation-delay: 0.1s; }
+    .delay-200 { animation-delay: 0.2s; }
+    .delay-300 { animation-delay: 0.3s; }
+    .delay-400 { animation-delay: 0.4s; }
+  </style>
+</head>
+<body class="bg-dark-bg text-dark-text antialiased">
+  <!-- Header -->
+  <header class="border-b border-dark-border bg-dark-surface/50 backdrop-blur-sm sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="logo.svg" alt="MyDevStack Logo" class="w-10 h-10">
+        <span class="text-xl font-bold text-dark-text">MyDevStack</span>
+      </div>
+      <a href="https://github.com/beabys/mydevstack" target="_blank" rel="noopener noreferrer"
+         class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-colors">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-primary-950/40 via-dark-bg to-dark-bg pointer-events-none"></div>
+    <div class="max-w-6xl mx-auto px-6 pt-24 pb-20 text-center relative">
+      <div class="animate-fade-in-up">
+        <img src="logo.svg" alt="MyDevStack Logo" class="w-24 h-24 mx-auto mb-6">
+        <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight text-dark-text mb-4">
+          Local AWS Development,
+          <span class="text-primary-400">Visualized</span>
+        </h1>
+        <p class="text-xl text-dark-muted max-w-3xl mx-auto mb-8 leading-relaxed">
+          A modern, developer-friendly web interface for managing AWS services running locally via
+          <span class="text-dark-text font-medium">LocalStack</span>,
+          <span class="text-dark-text font-medium">FloCi</span>, and other AWS emulators.
+        </p>
+        <div class="flex items-center justify-center gap-4">
+          <a href="https://github.com/beabys/mydevstack" target="_blank" rel="noopener noreferrer"
+             class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold transition-colors text-lg">
+            View on GitHub
+          </a>
+          <a href="#features"
+             class="px-6 py-3 border border-dark-border hover:border-primary-500/50 text-dark-muted hover:text-dark-text rounded-xl font-medium transition-all text-lg">
+            Explore Features
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Bar -->
+  <section class="border-y border-dark-border bg-dark-surface/30">
+    <div class="max-w-6xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <div>
+        <div class="text-3xl font-bold text-primary-400">18+</div>
+        <div class="text-sm text-dark-muted">AWS Services</div>
+      </div>
+      <div>
+        <div class="text-3xl font-bold text-primary-400">1</div>
+        <div class="text-sm text-dark-muted">Docker Image</div>
+      </div>
+      <div>
+        <div class="text-3xl font-bold text-primary-400">Zero</div>
+        <div class="text-sm text-dark-muted">Cloud Costs</div>
+      </div>
+      <div>
+        <div class="text-3xl font-bold text-primary-400">100%</div>
+        <div class="text-sm text-dark-muted">Local</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="py-20">
+    <div class="max-w-6xl mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-4">Supported Services</h2>
+      <p class="text-dark-muted text-center mb-12 max-w-2xl mx-auto">
+        Each service comes with a dedicated management interface, real-time status updates,
+        CRUD operations, and embedded usage examples to help developers get started quickly.
+      </p>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Service cards -->
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
+            <h3 class="font-semibold">S3</h3>
+          </div>
+          <p class="text-sm text-dark-muted">Browse buckets, upload/download objects, generate pre-signed URLs, configure Lambda triggers and bucket policies.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
+            <h3 class="font-semibold">Lambda</h3>
+          </div>
+          <p class="text-sm text-dark-muted">Create and manage functions, edit configurations, invoke with custom payloads, view results in real-time.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-3 h-3 rounded-full" style="background:#FF4F8B"></div>
+            <h3 class="font-semibold">DynamoDB</h3>
+          </div>
+          <p class="text-sm text-dark-muted">Manage tables, explore data with scan/query, add and delete items, view stream records.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-3 h-3 rounded-full" style="background:#FF4F8B"></div>
+            <h3 class="font-semibold">SQS</h3>
+          </div>
+          <p class="text-sm text-dark-muted">View queues, send and receive messages, inspect queue attributes and configuration.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-3 h-3 rounded-full" style="background:#FF4F8B"></div>
+            <h3 class="font-semibold">SNS</h3>
+          </div>
+          <p class="text-sm text-dark-muted">Create topics, manage subscriptions across multiple protocols, publish messages with ease.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-3 h-3 rounded-full" style="background:#DD344C"></div>
+            <h3 class="font-semibold">IAM</h3>
+          </div>
+          <p class="text-sm text-dark-muted">Manage users, roles, policies, groups. Generate keys, attach and detach policies visually.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-3 h-3 rounded-full" style="background:#A81B9C"></div>
+            <h3 class="font-semibold">KMS</h3>
+          </div>
+          <p class="text-sm text-dark-muted">Create and manage encryption keys, encrypt and decrypt data, view key policies.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-3 h-3 rounded-full" style="background:#A81B9C"></div>
+            <h3 class="font-semibold">Secrets Manager</h3>
+          </div>
+          <p class="text-sm text-dark-muted">Store and retrieve secrets, edit values, view secret history in a clean interface.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-3 h-3 rounded-full" style="background:#00B9CE"></div>
+            <h3 class="font-semibold">Kinesis</h3>
+          </div>
+          <p class="text-sm text-dark-muted">Create streams, put records, view shards and retrieve data records interactively.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-3 h-3 rounded-full" style="background:#FF4F8B"></div>
+            <h3 class="font-semibold">SSM Parameter Store</h3>
+          </div>
+          <p class="text-sm text-dark-muted">Manage parameters with different tiers, view values and history, organize by path.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
+            <h3 class="font-semibold">Step Functions</h3>
+          </div>
+          <p class="text-sm text-dark-muted">Create and manage state machines, start and monitor executions, view execution history.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
+            <h3 class="font-semibold">CloudFormation</h3>
+          </div>
+          <p class="text-sm text-dark-muted">Create and manage stacks, view resources and outputs, support for JSON and YAML templates.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
+            <h3 class="font-semibold">RDS</h3>
+          </div>
+          <p class="text-sm text-dark-muted">Create and manage database instances, reboot, delete, and monitor instance status.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-3 h-3 rounded-full" style="background:#4053D6"></div>
+            <h3 class="font-semibold">ElastiCache</h3>
+          </div>
+          <p class="text-sm text-dark-muted">Manage Valkey/Redis replication groups, create and delete cache clusters.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-3 h-3 rounded-full" style="background:#FF4F8B"></div>
+            <h3 class="font-semibold">API Gateway</h3>
+          </div>
+          <p class="text-sm text-dark-muted">Create HTTP and REST APIs, manage routes, integrations, stages, and deployments.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screenshots Gallery -->
+  <section class="py-20 bg-dark-surface/30 border-y border-dark-border">
+    <div class="max-w-6xl mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-4">See It in Action</h2>
+      <p class="text-dark-muted text-center mb-12 max-w-2xl mx-auto">
+        Every service provides an intuitive management interface with accordion details,
+        interactive forms, and built-in usage examples for AWS CLI, JavaScript, Python, and Go.
+      </p>
+
+      <div class="space-y-16">
+        <!-- Dashboard Overview -->
+        <div class="animate-fade-in-up">
+          <div class="flex items-center gap-3 mb-4">
+            <svg class="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+            <h3 class="text-xl font-semibold">Dashboard Overview</h3>
+          </div>
+          <p class="text-sm text-dark-muted mb-4">
+            The dashboard provides an at-a-glance overview of your local AWS environment, including
+            connection status, resource counts across all services, and quick-action shortcuts for
+            the most common operations. Monitor your entire sandbox from a single entry point.
+          </p>
+          <img src="screenshots/dashboard-overview.png" alt="Dashboard overview showing connection status and resource counts" class="screenshot-img w-full rounded-xl border border-dark-border shadow-2xl" loading="lazy">
+        </div>
+
+        <!-- S3 -->
+        <div class="animate-fade-in-up delay-100">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
+            <h3 class="text-xl font-semibold">S3 Buckets</h3>
+          </div>
+          <p class="text-sm text-dark-muted mb-4">Browse and manage your buckets. Upload and download objects, generate pre-signed URLs, configure triggers and policies. Usage examples available for every service.</p>
+          <img src="screenshots/s3-buckets.png" alt="S3 Buckets management interface" class="screenshot-img w-full rounded-xl border border-dark-border shadow-2xl" loading="lazy">
+        </div>
+
+        <!-- Lambda -->
+        <div class="animate-fade-in-up delay-200">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
+            <h3 class="text-xl font-semibold">Lambda Functions</h3>
+          </div>
+          <p class="text-sm text-dark-muted mb-4">View all functions at a glance with runtime, memory, and timeout columns. Expand any function to see details, copy ARN, and invoke with custom payloads.</p>
+          <div class="grid md:grid-cols-2 gap-6">
+            <img src="screenshots/lambda-functions.png" alt="Lambda Functions list" class="screenshot-img w-full rounded-xl border border-dark-border shadow-2xl" loading="lazy">
+            <img src="screenshots/lambda-detail.png" alt="Lambda function detail with accordion" class="screenshot-img w-full rounded-xl border border-dark-border shadow-2xl" loading="lazy">
+          </div>
+        </div>
+
+        <!-- CloudFormation -->
+        <div class="animate-fade-in-up delay-300">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
+            <h3 class="text-xl font-semibold">CloudFormation</h3>
+          </div>
+          <p class="text-sm text-dark-muted mb-4">Create and manage stacks with JSON or YAML templates. Expand any stack to inspect resources, outputs, and drift status. Built-in validation catches errors before deployment.</p>
+          <img src="screenshots/cloudformation-stacks.png" alt="CloudFormation stacks with expanded details" class="screenshot-img w-full rounded-xl border border-dark-border shadow-2xl" loading="lazy">
+        </div>
+
+        <!-- RDS + ElastiCache -->
+        <div class="animate-fade-in-up delay-400">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
+            <h3 class="text-xl font-semibold">RDS &amp; ElastiCache</h3>
+          </div>
+          <p class="text-sm text-dark-muted mb-4">Manage database instances and cache clusters directly from the interface. Every service page includes usage examples in multiple programming languages.</p>
+          <div class="grid md:grid-cols-2 gap-6">
+            <img src="screenshots/rds-instances.png" alt="RDS instances" class="screenshot-img w-full rounded-xl border border-dark-border shadow-2xl" loading="lazy">
+            <img src="screenshots/elasticache-empty.png" alt="ElastiCache with empty state" class="screenshot-img w-full rounded-xl border border-dark-border shadow-2xl" loading="lazy">
+          </div>
+        </div>
+
+        <!-- IAM -->
+        <div class="animate-fade-in-up delay-400">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-3 h-3 rounded-full" style="background:#DD344C"></div>
+            <h3 class="text-xl font-semibold">IAM</h3>
+          </div>
+          <p class="text-sm text-dark-muted mb-4">Full IAM management with tabbed interface for Users, Roles, Policies, and Groups. Manage access keys, attach and detach policies, all without leaving the browser.</p>
+          <div class="grid md:grid-cols-2 gap-6">
+            <img src="screenshots/iam-users.png" alt="IAM Users tab" class="screenshot-img w-full rounded-xl border border-dark-border shadow-2xl" loading="lazy">
+            <img src="screenshots/iam-roles.png" alt="IAM Roles tab" class="screenshot-img w-full rounded-xl border border-dark-border shadow-2xl" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Capabilities -->
+  <section class="py-20">
+    <div class="max-w-6xl mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-12">Key Capabilities</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-dark-surface border border-dark-border rounded-xl p-6">
+          <div class="w-12 h-12 bg-primary-500/10 rounded-xl flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+          <h3 class="font-semibold mb-2">Multi-Service Browser</h3>
+          <p class="text-sm text-dark-muted">Navigate 18+ AWS services through a clean, responsive interface. Search, filter, and manage resources without leaving the browser.</p>
+        </div>
+        <div class="bg-dark-surface border border-dark-border rounded-xl p-6">
+          <div class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h3 class="font-semibold mb-2">CRUD Operations</h3>
+          <p class="text-sm text-dark-muted">Create, read, update, and delete resources through intuitive forms and modals. Real-time validation and error feedback.</p>
+        </div>
+        <div class="bg-dark-surface border border-dark-border rounded-xl p-6">
+          <div class="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+          </div>
+          <h3 class="font-semibold mb-2">Code Examples</h3>
+          <p class="text-sm text-dark-muted">Every service includes built-in usage examples in AWS CLI, JavaScript, Python, and Go. Copy and paste to get started immediately.</p>
+        </div>
+        <div class="bg-dark-surface border border-dark-border rounded-xl p-6">
+          <div class="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+          </div>
+          <h3 class="font-semibold mb-2">Dark Mode UI</h3>
+          <p class="text-sm text-dark-muted">Modern dark-first design with light mode toggle for a polished experience.</p>
+        </div>
+        <div class="bg-dark-surface border border-dark-border rounded-xl p-6">
+          <div class="w-12 h-12 bg-cyan-500/10 rounded-xl flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+          </div>
+          <h3 class="font-semibold mb-2">Dynamic Pagination</h3>
+          <p class="text-sm text-dark-muted">Adjustable items-per-page selector across all list views. Sort by columns, navigate with Previous/Next buttons, and always know your position.</p>
+        </div>
+        <div class="bg-dark-surface border border-dark-border rounded-xl p-6">
+          <div class="w-12 h-12 bg-rose-500/10 rounded-xl flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          </div>
+          <h3 class="font-semibold mb-2">Secure by Design</h3>
+          <p class="text-sm text-dark-muted">Go backend proxy authenticates all requests. KMS encryption/decryption, IAM policy management, and Secrets Manager are first-class features.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="py-20 bg-dark-surface/30 border-y border-dark-border">
+    <div class="max-w-6xl mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-4">How It Works</h2>
+      <p class="text-dark-muted text-center mb-12 max-w-2xl mx-auto">
+        MyDevStack runs as a single Docker image that the frontend with a REST API proxy,
+        connecting to any AWS-compatible local emulator.
+      </p>
+      <div class="grid md:grid-cols-3 gap-8 text-center">
+        <div>
+          <div class="w-16 h-16 bg-primary-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl font-bold text-primary-400">1</span>
+          </div>
+          <h3 class="font-semibold mb-2">Choose Your Emulator</h3>
+          <p class="text-sm text-dark-muted">Works with LocalStack, FloCi, MiniStack, or any AWS-compatible local endpoint.</p>
+        </div>
+        <div>
+          <div class="w-16 h-16 bg-primary-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl font-bold text-primary-400">2</span>
+          </div>
+          <h3 class="font-semibold mb-2">Run the Docker Image</h3>
+          <p class="text-sm text-dark-muted">One command starts the proxy Service and frontend. The proxy handles all AWS SDK communication.</p>
+        </div>
+        <div>
+          <div class="w-16 h-16 bg-primary-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <span class="text-2xl font-bold text-primary-400">3</span>
+          </div>
+          <h3 class="font-semibold mb-2">Open the Browser</h3>
+          <p class="text-sm text-dark-muted">Navigate to any service, manage resources, and copy code examples — all without the terminal.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Support -->
+  <section class="py-20">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <div class="bg-dark-surface border border-dark-border rounded-xl p-10">
+        <div class="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <svg class="w-8 h-8 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+        <h2 class="text-2xl font-bold mb-3">Sustaining the Project</h2>
+        <p class="text-dark-muted max-w-2xl mx-auto mb-6 leading-relaxed">
+          MyDevStack is an open-source project built and maintained in my spare time.
+          If you find it valuable for your development workflow, consider supporting its
+          continued evolution. Contributions of any kind — whether code contributions,
+          bug reports, feature suggestions, or financial support — help ensure the project
+          remains active and improves over time.
+        </p>
+        <a href="https://www.buymeacoffee.com/beabys" target="_blank" rel="noopener noreferrer"
+           class="inline-flex items-center gap-3 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-amber-950 font-semibold rounded-xl transition-colors">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          Buy Me a Coffee
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer / Disclaimer -->
+  <footer class="py-16 border-t border-dark-border">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <img src="logo.svg" alt="MyDevStack Logo" class="w-16 h-16 mx-auto mb-4 opacity-50">
+      <div class="bg-dark-surface border border-dark-border rounded-xl p-8 mb-8 text-left">
+        <h3 class="font-semibold mb-3 text-sm uppercase tracking-wider text-dark-muted">Disclaimer</h3>
+        <p class="text-sm text-dark-muted leading-relaxed">
+          MyDevStack is a development tool designed to enhance developer productivity by providing
+          a graphical interface for interacting with local AWS service emulators. It is not intended
+          to replace or serve as a substitute for the official AWS Management Console or any
+          production AWS services. This application is provided for development and testing purposes
+          only, and should not be used to manage production AWS infrastructure. Users are responsible
+          for ensuring compliance with AWS terms of service when using this tool alongside any AWS
+          environments.
+        </p>
+      </div>
+      <div class="flex items-center justify-center gap-6 text-sm text-dark-muted">
+        <a href="https://github.com/beabys/mydevstack" target="_blank" rel="noopener noreferrer" class="hover:text-dark-text transition-colors">
+          <svg class="w-5 h-5 inline-block mr-1" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+        <span class="text-dark-border">|</span>
+        <a href="https://www.buymeacoffee.com/beabys" target="_blank" rel="noopener noreferrer" class="hover:text-dark-text transition-colors">Buy Me a Coffee</a>
+        <span class="text-dark-border">|</span>
+        <span>&copy; <script>document.write(new Date().getFullYear())</script> My DevStack</span>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
