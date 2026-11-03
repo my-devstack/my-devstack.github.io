@@ -1,6 +1,6 @@
 # MyDevStack
 
-> **Local AWS Development, Visualized** — A modern, developer-friendly web interface for managing AWS services running locally via LocalStack, FloCi, and other AWS emulators.
+> **Local AWS Control Panel** — MyDevStack is the UI only (Vue frontend + Go proxy). It ships no emulator; point it at any AWS-compatible local endpoint you already run. Create, edit, and delete resources across **25+ AWS services**. No AWS account required.
 
 This repository hosts the [MyDevStack](https://github.com/my-devstack/mydevstack) landing page at **[my-devstack.github.io](https://my-devstack.github.io)**.
 
@@ -11,15 +11,27 @@ This repository hosts the [MyDevStack](https://github.com/my-devstack/mydevstack
 - **Google Fonts** — Inter (UI) + JetBrains Mono (code)
 - **GitHub Pages** — Hosting
 
+## Site Files
+
+- `index.html` — landing page (single file, no build step)
+- `robots.txt` — allows all crawlers, points to sitemap
+- `sitemap.xml` — single URL entry for the landing page
+- `logo.svg`, `screenshots/` — static assets referenced from the page
+
 ## Development
 
-No build step required. Just open `index.html` in a browser.
+No build step required. Just open `index.html` in a browser, or serve the directory:
+
+```bash
+python3 -m http.server 8081
+# open http://localhost:8081
+```
 
 ## Related
 
 | Repo | Description |
 |------|-------------|
-| [my-devstack/mydevstack](https://github.com/my-devstack/mydevstack) | MyDevStack application (Go backend + frontend) |
+| [my-devstack/mydevstack](https://github.com/my-devstack/mydevstack) | MyDevStack application (Go backend + Vue frontend) |
 
 ## License
 

@@ -3,8 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MyDevStack — Local AWS Development, Visualized</title>
-  <meta name="description" content="MyDevStack is a modern, developer-friendly web interface for managing AWS services running locally via emulators like LocalStack and FloCi.">
+  <title>MyDevStack — Local AWS Control Panel: Create, Edit, Delete 25+ Services</title>
+  <meta name="description" content="MyDevStack is a CRUD web UI for AWS services running in your local emulator. Create, edit, and delete resources across 25+ AWS services. UI only — no emulator bundled, no AWS account required.">
+  <link rel="canonical" href="https://my-devstack.github.io/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="MyDevStack — Local AWS Control Panel (CRUD, 25+ Services)">
+  <meta property="og:description" content="Create, edit, and delete resources across 25+ AWS services on your laptop. Full CRUD control panel for the local AWS emulator you already run.">
+  <meta property="og:url" content="https://my-devstack.github.io/">
+  <meta property="og:image" content="https://my-devstack.github.io/screenshots/dashboard-overview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="MyDevStack — Local AWS Control Panel (CRUD, 25+ Services)">
+  <meta name="twitter:description" content="Create, edit, and delete resources across 25+ AWS services on your laptop. Full CRUD control panel for the local AWS emulator you already run.">
+  <meta name="twitter:image" content="https://my-devstack.github.io/screenshots/dashboard-overview.png">
   <meta name="theme-color" content="#0f172a">
   <link rel="icon" type="image/svg+xml" href="logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -73,6 +83,72 @@
     .delay-300 { animation-delay: 0.3s; }
     .delay-400 { animation-delay: 0.4s; }
   </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "MyDevStack",
+    "description": "MyDevStack is a CRUD web UI for AWS services running in your local emulator. Create, edit, and delete resources across 25+ AWS services. UI only — no emulator bundled, no AWS account required.",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Linux, macOS, Windows (Docker)",
+    "url": "https://my-devstack.github.io/",
+    "codeRepository": "https://github.com/my-devstack/mydevstack",
+    "license": "MIT",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is MyDevStack a read-only monitoring dashboard?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. MyDevStack is a full CRUD control panel. You create, edit, and delete resources across all 25+ supported AWS services directly from the UI. Most service pages also include built-in usage examples for AWS CLI, JavaScript, Python, and Go."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do I need an AWS account or real AWS credentials?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. MyDevStack talks to a local AWS emulator such as LocalStack, FloCi, or MiniStack. Any values you enter for AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are forwarded to the emulator; no real AWS account, IAM user, or billing relationship is required."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does MyDevStack work offline?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Once the Docker container and your chosen local emulator are running, everything works without internet access. The UI, the Go proxy, and the emulator all stay on your machine."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does MyDevStack include an emulator?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. MyDevStack is only the UI — a Vue frontend plus a Go proxy in one Docker image. It ships no emulator and no AWS services. It connects to any AWS-compatible endpoint you already run; LocalStack, FloCi, and MiniStack are simply the endpoints it is most often pointed at."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is MyDevStack free and open source?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. MyDevStack is released under the MIT license. The Docker image is free, the source is public on GitHub, and there are no paid tiers, no telemetry, and no usage limits."
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body class="bg-dark-bg text-dark-text antialiased">
   <!-- Header -->
@@ -93,26 +169,34 @@
   <!-- Hero -->
   <section class="relative overflow-hidden">
     <div class="absolute inset-0 bg-gradient-to-b from-primary-950/40 via-dark-bg to-dark-bg pointer-events-none"></div>
-    <div class="max-w-6xl mx-auto px-6 pt-24 pb-20 text-center relative">
+    <div class="max-w-6xl mx-auto px-6 pt-24 pb-16 text-center relative">
       <div class="animate-fade-in-up">
         <img src="logo.svg" alt="MyDevStack Logo" class="w-24 h-24 mx-auto mb-6">
         <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight text-dark-text mb-4">
-          Local AWS Development,
-          <span class="text-primary-400">Visualized</span>
+          Your Local AWS
+          <span class="text-primary-400">Control Panel</span>
         </h1>
-        <p class="text-xl text-dark-muted max-w-3xl mx-auto mb-8 leading-relaxed">
-          A modern, developer-friendly web interface for managing AWS services running locally via
-          <span class="text-dark-text font-medium">LocalStack</span>,
-          <span class="text-dark-text font-medium">FloCi</span>, and other AWS emulators.
+        <p class="text-xl text-dark-muted max-w-3xl mx-auto mb-6 leading-relaxed">
+          Create, edit, and delete resources across
+          <span class="text-dark-text font-semibold">25+ AWS services</span> running
+          locally on your machine. One Docker image. Your own emulator. Zero cloud bills.
+        </p>
+        <p class="text-sm text-primary-300 max-w-2xl mx-auto mb-8 font-medium">
+          This is not a monitoring dashboard — MyDevStack is a full CRUD UI. Every
+          service page lets you create and delete resources, edit configuration, and
+          invoke actions, not just view them.
+        </p>
+        <p class="text-sm text-dark-muted max-w-2xl mx-auto mb-8">
+          MyDevStack is the UI only — it ships no emulator and no AWS services; it plugs into the local endpoint you already run.
         </p>
         <div class="flex items-center justify-center gap-4">
           <a href="https://github.com/my-devstack/mydevstack" target="_blank" rel="noopener noreferrer"
              class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold transition-colors text-lg">
             View on GitHub
           </a>
-          <a href="#features"
+          <a href="#capabilities"
              class="px-6 py-3 border border-dark-border hover:border-primary-500/50 text-dark-muted hover:text-dark-text rounded-xl font-medium transition-all text-lg">
-            Explore Features
+            See What You Can Do
           </a>
         </div>
       </div>
@@ -123,8 +207,12 @@
   <section class="border-y border-dark-border bg-dark-surface/30">
     <div class="max-w-6xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
       <div>
-        <div class="text-3xl font-bold text-primary-400">18+</div>
+        <div class="text-3xl font-bold text-primary-400">25+</div>
         <div class="text-sm text-dark-muted">AWS Services</div>
+      </div>
+      <div>
+        <div class="text-3xl font-bold text-primary-400">Any</div>
+        <div class="text-sm text-dark-muted">AWS-compatible endpoint</div>
       </div>
       <div>
         <div class="text-3xl font-bold text-primary-400">1</div>
@@ -134,20 +222,78 @@
         <div class="text-3xl font-bold text-primary-400">Zero</div>
         <div class="text-sm text-dark-muted">Cloud Costs</div>
       </div>
-      <div>
-        <div class="text-3xl font-bold text-primary-400">100%</div>
-        <div class="text-sm text-dark-muted">Local</div>
+    </div>
+  </section>
+
+  <!-- What you can do in the UI -->
+  <section id="capabilities" class="py-20">
+    <div class="max-w-6xl mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-4">What You Can Do in the UI</h2>
+      <p class="text-dark-muted text-center mb-12 max-w-2xl mx-auto">
+        Concrete write actions, not just browsing. Each of these maps to a real view
+        inside MyDevStack.
+      </p>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <h3 class="font-semibold mb-2 text-primary-300">S3</h3>
+          <p class="text-sm text-dark-muted">Create a bucket, upload objects, generate presigned URLs, edit lifecycle rules, bucket policies, and Lambda triggers.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <h3 class="font-semibold mb-2 text-primary-300">Lambda</h3>
+          <p class="text-sm text-dark-muted">Create a function, edit its code and configuration, invoke with a custom payload, and wire up Event Source Mappings.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <h3 class="font-semibold mb-2 text-primary-300">DynamoDB</h3>
+          <p class="text-sm text-dark-muted">Create a table, insert and delete items, run scans and queries, and browse DynamoDB Streams records.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <h3 class="font-semibold mb-2 text-primary-300">SQS &amp; SNS</h3>
+          <p class="text-sm text-dark-muted">Create queues and topics, send and receive messages, manage subscriptions across protocols, and publish from the UI.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <h3 class="font-semibold mb-2 text-primary-300">IAM</h3>
+          <p class="text-sm text-dark-muted">Create users, roles, groups, and policies. Generate access keys, and attach or detach policies visually.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <h3 class="font-semibold mb-2 text-primary-300">KMS &amp; Secrets</h3>
+          <p class="text-sm text-dark-muted">Create KMS keys, encrypt and decrypt data, and create, edit, and view the history of secrets in Secrets Manager.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <h3 class="font-semibold mb-2 text-primary-300">CloudFormation</h3>
+          <p class="text-sm text-dark-muted">Create stacks from JSON or YAML templates, inspect resources and outputs, and delete stacks when done.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <h3 class="font-semibold mb-2 text-primary-300">EC2, VPC &amp; RDS</h3>
+          <p class="text-sm text-dark-muted">Launch EC2 instances, configure key pairs, security groups, and elastic IPs. Build VPCs with subnets, route tables, IGW, NAT gateways, and network ACLs. Create RDS instances, snapshots, reboot and delete them.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <h3 class="font-semibold mb-2 text-primary-300">Cognito</h3>
+          <p class="text-sm text-dark-muted">Create a user pool, add users and clients, configure resource servers, test the login flow, and reset passwords from the UI.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <h3 class="font-semibold mb-2 text-primary-300">ECS, ECR &amp; CloudFront</h3>
+          <p class="text-sm text-dark-muted">Create ECS clusters, register task definitions, and run services. Push images to ECR repositories. Configure CloudFront distributions with custom origins, behaviors, and S3 static content.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <h3 class="font-semibold mb-2 text-primary-300">API Gateway</h3>
+          <p class="text-sm text-dark-muted">Create REST, HTTP, and WebSocket APIs, wire up integrations and authorizers, and test invoke URLs end to end.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <h3 class="font-semibold mb-2 text-primary-300">Step Functions, SES &amp; CloudWatch</h3>
+          <p class="text-sm text-dark-muted">Start state machine executions, send emails and manage SES templates and identities, and create CloudWatch metric alarms, logs views, and dashboards.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Features -->
-  <section id="features" class="py-20">
+  <!-- Features: 25+ services grid -->
+  <section id="features" class="py-20 bg-dark-surface/30 border-y border-dark-border">
     <div class="max-w-6xl mx-auto px-6">
-      <h2 class="text-3xl font-bold text-center mb-4">Supported Services</h2>
+      <h2 class="text-3xl font-bold text-center mb-4">25+ AWS Services, All Local</h2>
       <p class="text-dark-muted text-center mb-12 max-w-2xl mx-auto">
-        Each service comes with a dedicated management interface, real-time status updates,
-        CRUD operations, and embedded usage examples to help developers get started quickly.
+        Each service has a dedicated management interface with create, edit, and delete
+        operations, plus real-time status and resource counts. Most service pages also
+        include built-in usage examples for AWS CLI, JavaScript, Python, and Go.
       </p>
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <!-- Service cards -->
@@ -156,180 +302,182 @@
             <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
             <h3 class="font-semibold">S3</h3>
           </div>
-          <p class="text-sm text-dark-muted">Browse buckets, upload/download objects, generate pre-signed URLs, configure Lambda triggers and bucket policies.</p>
+          <p class="text-sm text-dark-muted">Create buckets, upload and delete objects, generate presigned URLs, configure Lambda triggers, lifecycle rules, and bucket policies.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
             <h3 class="font-semibold">Lambda</h3>
           </div>
-          <p class="text-sm text-dark-muted">Create and manage functions, edit configurations, invoke with custom payloads, view results in real-time.</p>
+          <p class="text-sm text-dark-muted">Create and edit functions, configure runtime settings, invoke with custom payloads, and view results in real time.</p>
+        </div>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
+            <h3 class="font-semibold">Lambda Event Source Mapping</h3>
+          </div>
+          <p class="text-sm text-dark-muted">Wire SQS, Kinesis, DynamoDB Streams, and other event sources to Lambda functions, and enable or disable mappings from the UI.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#FF4F8B"></div>
             <h3 class="font-semibold">DynamoDB</h3>
           </div>
-          <p class="text-sm text-dark-muted">Manage tables, explore data with scan/query, add and delete items, view stream records.</p>
+          <p class="text-sm text-dark-muted">Create tables, insert and delete items, run scans and queries, and inspect DynamoDB Streams records.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#FF4F8B"></div>
             <h3 class="font-semibold">SQS</h3>
           </div>
-          <p class="text-sm text-dark-muted">View queues, send and receive messages, inspect queue attributes and configuration.</p>
+          <p class="text-sm text-dark-muted">Create and delete queues, send and receive messages, and inspect queue attributes and configuration.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#FF4F8B"></div>
             <h3 class="font-semibold">SNS</h3>
           </div>
-          <p class="text-sm text-dark-muted">Create topics, manage subscriptions across multiple protocols, publish messages with ease.</p>
+          <p class="text-sm text-dark-muted">Create topics, manage subscriptions across protocols, and publish messages from the UI.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#DD344C"></div>
             <h3 class="font-semibold">IAM</h3>
           </div>
-          <p class="text-sm text-dark-muted">Manage users, roles, policies, groups. Generate keys, attach and detach policies visually.</p>
+          <p class="text-sm text-dark-muted">Create users, roles, groups, and policies. Generate access keys, and attach or detach policies visually.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#A81B9C"></div>
             <h3 class="font-semibold">KMS</h3>
           </div>
-          <p class="text-sm text-dark-muted">Create and manage encryption keys, encrypt and decrypt data, view key policies.</p>
+          <p class="text-sm text-dark-muted">Create customer-managed keys, encrypt and decrypt data, and edit key policies.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#A81B9C"></div>
             <h3 class="font-semibold">Secrets Manager</h3>
           </div>
-          <p class="text-sm text-dark-muted">Store and retrieve secrets, edit values, view secret history in a clean interface.</p>
+          <p class="text-sm text-dark-muted">Create and edit secrets, retrieve values, and view the full version history of each secret.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#00B9CE"></div>
             <h3 class="font-semibold">Kinesis</h3>
           </div>
-          <p class="text-sm text-dark-muted">Create streams, put records, view shards and retrieve data records interactively.</p>
+          <p class="text-sm text-dark-muted">Create streams, put records, view shards, and retrieve data records interactively.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#FF4F8B"></div>
             <h3 class="font-semibold">SSM Parameter Store</h3>
           </div>
-          <p class="text-sm text-dark-muted">Manage parameters with different tiers, view values and history, organize by path.</p>
+          <p class="text-sm text-dark-muted">Create and edit parameters across tiers, organize by path, and view values and history.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
             <h3 class="font-semibold">Step Functions</h3>
           </div>
-          <p class="text-sm text-dark-muted">Create and manage state machines, start and monitor executions, view execution history.</p>
+          <p class="text-sm text-dark-muted">Create state machines from ASL definitions, start executions, and inspect execution history.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
             <h3 class="font-semibold">CloudFormation</h3>
           </div>
-          <p class="text-sm text-dark-muted">Create and manage stacks, view resources and outputs, support for JSON and YAML templates.</p>
+          <p class="text-sm text-dark-muted">Create stacks from JSON or YAML templates, inspect resources and outputs, and delete stacks.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
             <h3 class="font-semibold">RDS</h3>
           </div>
-          <p class="text-sm text-dark-muted">Create and manage database instances, reboot, delete, and monitor instance status.</p>
+          <p class="text-sm text-dark-muted">Create database instances, take snapshots, reboot, and delete instances from the UI.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#4053D6"></div>
             <h3 class="font-semibold">ElastiCache</h3>
           </div>
-          <p class="text-sm text-dark-muted">Manage Valkey/Redis replication groups, create and delete cache clusters.</p>
+          <p class="text-sm text-dark-muted">Create and delete Valkey/Redis replication groups, and manage cache clusters.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#FF4F8B"></div>
             <h3 class="font-semibold">API Gateway</h3>
           </div>
-          <p class="text-sm text-dark-muted">Create HTTP and REST APIs, manage routes, integrations, stages, and deployments.</p>
-        </div>
-        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
-          <div class="flex items-center gap-3 mb-3">
-            <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
-            <h3 class="font-semibold">Lambda ESM</h3>
-          </div>
-          <p class="text-sm text-dark-muted">Same as Lambda with support for ES modules. Create, invoke and manage ESM-based functions with native import/export support.</p>
+          <p class="text-sm text-dark-muted">Create REST, HTTP, and WebSocket APIs, manage routes, integrations, authorizers, stages, and deployments.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
             <h3 class="font-semibold">SES</h3>
           </div>
-          <p class="text-sm text-dark-muted">Send emails programmatically. Manage identities, verify recipients, and view sent email statistics.</p>
+          <p class="text-sm text-dark-muted">Send emails, verify identities, manage email templates, and inspect send statistics.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
             <h3 class="font-semibold">CloudWatch</h3>
           </div>
-          <p class="text-sm text-dark-muted">Monitor your local environment. View logs, set alarms, and track metrics without touching the AWS Console.</p>
+          <p class="text-sm text-dark-muted">Create metric alarms, browse logs, and build dashboards for your local environment.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
             <h3 class="font-semibold">OpenSearch</h3>
           </div>
-          <p class="text-sm text-dark-muted">Deploy and manage search and analytics clusters. Index documents, run queries, and explore data with a built-in dashboard.</p>
+          <p class="text-sm text-dark-muted">Create domains, index documents, run queries, and explore data with the built-in dashboard.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
             <h3 class="font-semibold">VPC</h3>
           </div>
-          <p class="text-sm text-dark-muted">Design and manage virtual networks. Create subnets, configure route tables, and set up security groups locally.</p>
+          <p class="text-sm text-dark-muted">Create VPCs, subnets, route tables, internet and NAT gateways, and network ACLs. Enable flow logs.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
             <h3 class="font-semibold">ECS</h3>
           </div>
-          <p class="text-sm text-dark-muted">Manage containerized applications. Create clusters, define task definitions, run tasks, and monitor container health.</p>
+          <p class="text-sm text-dark-muted">Create clusters, register task definitions, run tasks, and manage long-running services.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
             <h3 class="font-semibold">ECR</h3>
           </div>
-          <p class="text-sm text-dark-muted">Store, manage, and deploy container images. Browse repositories, view image tags, and pull images with built-in commands.</p>
+          <p class="text-sm text-dark-muted">Create repositories, push and delete images, and copy Docker login commands for your registry.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
             <h3 class="font-semibold">EC2</h3>
           </div>
-          <p class="text-sm text-dark-muted">Launch and manage virtual machines. Configure instance types, security groups, key pairs, and monitor running instances.</p>
+          <p class="text-sm text-dark-muted">Launch instances, manage key pairs, configure security groups and elastic IPs, and select VPC resources from a cross-service picker.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
             <h3 class="font-semibold">MSK</h3>
           </div>
-          <p class="text-sm text-dark-muted">Managed Apache Kafka. Create clusters, configure brokers, manage topics, and produce/consume messages through a clean interface.</p>
+          <p class="text-sm text-dark-muted">Create Kafka clusters, inspect bootstrap brokers, and manage topics.</p>
         </div>
         <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
             <h3 class="font-semibold">Cognito</h3>
           </div>
-          <p class="text-sm text-dark-muted">User authentication and authorization. Manage user pools, clients, and federated identities for your local applications.</p>
+          <p class="text-sm text-dark-muted">Create user pools, add users, configure clients and resource servers, test the login flow, and reset passwords.</p>
         </div>
-        <div class="service-card bg-dark-surface border border-dark-border border-dashed rounded-xl p-5 flex items-center justify-center min-h-[120px] cursor-default">
-          <div class="text-center">
-            <p class="text-lg text-dark-text">... and more being added</p>
+        <div class="service-card bg-dark-surface border border-dark-border rounded-xl p-5">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
+            <h3 class="font-semibold">CloudFront</h3>
           </div>
+          <p class="text-sm text-dark-muted">Create distributions, configure origins and cache behaviors, and serve S3 static content through a local CDN.</p>
         </div>
       </div>
     </div>
@@ -340,8 +488,9 @@
     <div class="max-w-6xl mx-auto px-6">
       <h2 class="text-3xl font-bold text-center mb-4">See It in Action</h2>
       <p class="text-dark-muted text-center mb-12 max-w-2xl mx-auto">
-        Every service provides an intuitive management interface with accordion details,
-        interactive forms, and built-in usage examples for AWS CLI, JavaScript, Python, and Go.
+        Every service page gives you forms, modals, and accordion detail views
+        to create, edit, and delete resources — plus usage examples on most pages
+        for AWS CLI, JavaScript, Python, and Go.
       </p>
 
       <div class="space-y-16">
@@ -352,9 +501,9 @@
             <h3 class="text-xl font-semibold">Dashboard Overview</h3>
           </div>
           <p class="text-sm text-dark-muted mb-4">
-            The dashboard provides an at-a-glance overview of your local AWS environment, including
-            connection status, resource counts across all services, and quick-action shortcuts for
-            the most common operations. Monitor your entire sandbox from a single entry point.
+            The dashboard is your control panel entry point: live connection status to the
+            emulator, current endpoint and region, per-service resource counts, and quick
+            shortcuts to the actions you use most.
           </p>
           <img src="screenshots/dashboard-overview.png" alt="Dashboard overview showing connection status and resource counts" class="screenshot-img w-full rounded-xl border border-dark-border shadow-2xl" loading="lazy">
         </div>
@@ -365,7 +514,7 @@
             <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
             <h3 class="text-xl font-semibold">S3 Buckets</h3>
           </div>
-          <p class="text-sm text-dark-muted mb-4">Browse and manage your buckets. Upload and download objects, generate pre-signed URLs, configure triggers and policies. Usage examples available for every service.</p>
+          <p class="text-sm text-dark-muted mb-4">Create buckets, upload and delete objects, generate presigned URLs, configure triggers and policies. Usage examples on most service pages.</p>
           <img src="screenshots/s3-buckets.png" alt="S3 Buckets management interface" class="screenshot-img w-full rounded-xl border border-dark-border shadow-2xl" loading="lazy">
         </div>
 
@@ -375,7 +524,7 @@
             <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
             <h3 class="text-xl font-semibold">Lambda Functions</h3>
           </div>
-          <p class="text-sm text-dark-muted mb-4">View all functions at a glance with runtime, memory, and timeout columns. Expand any function to see details, copy ARN, and invoke with custom payloads.</p>
+          <p class="text-sm text-dark-muted mb-4">Create a function, edit its configuration, copy the ARN, and invoke with custom payloads from an accordion detail view.</p>
           <div class="grid md:grid-cols-2 gap-6">
             <img src="screenshots/lambda-functions.png" alt="Lambda Functions list" class="screenshot-img w-full rounded-xl border border-dark-border shadow-2xl" loading="lazy">
             <img src="screenshots/lambda-detail.png" alt="Lambda function detail with accordion" class="screenshot-img w-full rounded-xl border border-dark-border shadow-2xl" loading="lazy">
@@ -388,7 +537,7 @@
             <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
             <h3 class="text-xl font-semibold">CloudFormation</h3>
           </div>
-          <p class="text-sm text-dark-muted mb-4">Create and manage stacks with JSON or YAML templates. Expand any stack to inspect resources, outputs, and drift status. Built-in validation catches errors before deployment.</p>
+          <p class="text-sm text-dark-muted mb-4">Create stacks from JSON or YAML templates. Inspect resources and outputs, and delete stacks when you are done. Built-in validation catches errors before deployment.</p>
           <img src="screenshots/cloudformation-stacks.png" alt="CloudFormation stacks with expanded details" class="screenshot-img w-full rounded-xl border border-dark-border shadow-2xl" loading="lazy">
         </div>
 
@@ -398,7 +547,7 @@
             <div class="w-3 h-3 rounded-full" style="background:#FF9900"></div>
             <h3 class="text-xl font-semibold">RDS &amp; ElastiCache</h3>
           </div>
-          <p class="text-sm text-dark-muted mb-4">Manage database instances and cache clusters directly from the interface. Every service page includes usage examples in multiple programming languages.</p>
+          <p class="text-sm text-dark-muted mb-4">Create database instances and Valkey/Redis replication groups, take snapshots, reboot, and delete — all from the UI.</p>
           <div class="grid md:grid-cols-2 gap-6">
             <img src="screenshots/rds-instances.png" alt="RDS instances" class="screenshot-img w-full rounded-xl border border-dark-border shadow-2xl" loading="lazy">
             <img src="screenshots/elasticache-empty.png" alt="ElastiCache with empty state" class="screenshot-img w-full rounded-xl border border-dark-border shadow-2xl" loading="lazy">
@@ -411,7 +560,7 @@
             <div class="w-3 h-3 rounded-full" style="background:#DD344C"></div>
             <h3 class="text-xl font-semibold">IAM</h3>
           </div>
-          <p class="text-sm text-dark-muted mb-4">Full IAM management with tabbed interface for Users, Roles, Policies, and Groups. Manage access keys, attach and detach policies, all without leaving the browser.</p>
+          <p class="text-sm text-dark-muted mb-4">Create users, roles, policies, and groups. Manage access keys, attach and detach policies, all without leaving the browser.</p>
           <div class="grid md:grid-cols-2 gap-6">
             <img src="screenshots/iam-users.png" alt="IAM Users tab" class="screenshot-img w-full rounded-xl border border-dark-border shadow-2xl" loading="lazy">
             <img src="screenshots/iam-roles.png" alt="IAM Roles tab" class="screenshot-img w-full rounded-xl border border-dark-border shadow-2xl" loading="lazy">
@@ -431,42 +580,42 @@
             <svg class="w-6 h-6 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
           </div>
           <h3 class="font-semibold mb-2">Multi-Service Browser</h3>
-          <p class="text-sm text-dark-muted">Navigate 18+ AWS services through a clean, responsive interface. Search, filter, and manage resources without leaving the browser.</p>
+          <p class="text-sm text-dark-muted">Navigate 25+ AWS services through one clean, responsive UI. Search, filter, and act on resources without leaving the browser.</p>
         </div>
         <div class="bg-dark-surface border border-dark-border rounded-xl p-6">
           <div class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mb-4">
             <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
-          <h3 class="font-semibold mb-2">CRUD Operations</h3>
-          <p class="text-sm text-dark-muted">Create, read, update, and delete resources through intuitive forms and modals. Real-time validation and error feedback.</p>
+          <h3 class="font-semibold mb-2">Full CRUD Operations</h3>
+          <p class="text-sm text-dark-muted">Create, read, update, and delete resources through intuitive forms and modals. Real-time validation and error feedback on every action.</p>
         </div>
         <div class="bg-dark-surface border border-dark-border rounded-xl p-6">
           <div class="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4">
             <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
           </div>
           <h3 class="font-semibold mb-2">Code Examples</h3>
-          <p class="text-sm text-dark-muted">Every service includes built-in usage examples in AWS CLI, JavaScript, Python, and Go. Copy and paste to get started immediately.</p>
+          <p class="text-sm text-dark-muted">Most service pages include built-in usage examples in AWS CLI, JavaScript, Python, and Go. Copy and paste to get started immediately.</p>
         </div>
         <div class="bg-dark-surface border border-dark-border rounded-xl p-6">
           <div class="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-4">
             <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
           </div>
           <h3 class="font-semibold mb-2">Dark Mode UI</h3>
-          <p class="text-sm text-dark-muted">Modern dark-first design with light mode toggle for a polished experience.</p>
+          <p class="text-sm text-dark-muted">Modern dark-first design with a light-mode toggle for a polished experience on any screen.</p>
         </div>
         <div class="bg-dark-surface border border-dark-border rounded-xl p-6">
           <div class="w-12 h-12 bg-cyan-500/10 rounded-xl flex items-center justify-center mb-4">
             <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
           </div>
-          <h3 class="font-semibold mb-2">Dynamic Pagination</h3>
-          <p class="text-sm text-dark-muted">Adjustable items-per-page selector across all list views. Sort by columns, navigate with Previous/Next buttons, and always know your position.</p>
+          <h3 class="font-semibold mb-2">Emulator-Agnostic UI</h3>
+          <p class="text-sm text-dark-muted">MyDevStack ships no emulator. Point it at any AWS-compatible endpoint you already run — LocalStack, FloCi, MiniStack, or your own — and switch endpoint, region, and credentials from Settings.</p>
         </div>
         <div class="bg-dark-surface border border-dark-border rounded-xl p-6">
           <div class="w-12 h-12 bg-rose-500/10 rounded-xl flex items-center justify-center mb-4">
             <svg class="w-6 h-6 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
           </div>
-          <h3 class="font-semibold mb-2">Secure by Design</h3>
-          <p class="text-sm text-dark-muted">Go backend proxy authenticates all requests. KMS encryption/decryption, IAM policy management, and Secrets Manager are first-class features.</p>
+          <h3 class="font-semibold mb-2">Logs &amp; Settings</h3>
+          <p class="text-sm text-dark-muted">Searchable Logs view for emulator traffic. Settings view with 15 regions, endpoint, credentials, theme, and advanced/about tabs.</p>
         </div>
       </div>
     </div>
@@ -477,30 +626,30 @@
     <div class="max-w-6xl mx-auto px-6">
       <h2 class="text-3xl font-bold text-center mb-4">How It Works</h2>
       <p class="text-dark-muted text-center mb-12 max-w-2xl mx-auto">
-        MyDevStack runs as a single Docker image that the frontend with a REST API proxy,
-        connecting to any AWS-compatible local emulator.
+        MyDevStack ships as a single Docker image that bundles the Vue frontend and a Go
+        REST API proxy, connecting to any AWS-compatible local emulator. It does not include an emulator.
       </p>
       <div class="grid md:grid-cols-3 gap-8 text-center">
         <div>
           <div class="w-16 h-16 bg-primary-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <span class="text-2xl font-bold text-primary-400">1</span>
           </div>
-          <h3 class="font-semibold mb-2">Choose Your Emulator</h3>
-          <p class="text-sm text-dark-muted">Works with LocalStack, FloCi, MiniStack, or any AWS-compatible local endpoint.</p>
+          <h3 class="font-semibold mb-2">Bring Your Emulator</h3>
+          <p class="text-sm text-dark-muted">MyDevStack does not bundle one. It connects to LocalStack, FloCi, MiniStack, or any AWS-compatible local endpoint you already run.</p>
         </div>
         <div>
           <div class="w-16 h-16 bg-primary-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <span class="text-2xl font-bold text-primary-400">2</span>
           </div>
           <h3 class="font-semibold mb-2">Run the Docker Image</h3>
-          <p class="text-sm text-dark-muted">One command starts the proxy Service and frontend. The proxy handles all AWS SDK communication.</p>
+          <p class="text-sm text-dark-muted">One command starts the frontend and the Go proxy. The proxy handles all AWS SDK communication.</p>
         </div>
         <div>
           <div class="w-16 h-16 bg-primary-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <span class="text-2xl font-bold text-primary-400">3</span>
           </div>
-          <h3 class="font-semibold mb-2">Open the Browser</h3>
-          <p class="text-sm text-dark-muted">Navigate to any service, manage resources, and copy code examples — all without the terminal.</p>
+          <h3 class="font-semibold mb-2">Open the Control Panel</h3>
+          <p class="text-sm text-dark-muted">Create, edit, and delete resources on any of the 25+ services — all without touching the terminal.</p>
         </div>
       </div>
     </div>
@@ -512,7 +661,7 @@
       <h2 class="text-3xl font-bold text-center mb-4">Quick Start</h2>
       <p class="text-dark-muted text-center mb-8 max-w-2xl mx-auto">
         Get MyDevStack running in seconds with a single command.
-        Just point it at your local AWS emulator and you're ready to go.
+        Just point it at your local AWS emulator and you are ready to go.
       </p>
 
       <div class="max-w-3xl mx-auto bg-dark-surface border border-dark-border rounded-xl overflow-hidden">
@@ -584,17 +733,85 @@
           <p class="text-sm text-dark-muted leading-relaxed">
             Before starting MyDevStack, make sure you have an AWS emulator running locally —
             such as <span class="text-dark-text font-medium">LocalStack</span>,
-            <span class="text-dark-text font-medium">ministack</span> or
+            <span class="text-dark-text font-medium">MiniStack</span>, or
             <span class="text-dark-text font-medium">FloCi</span> on port <code class="text-primary-400 font-mono">4566</code>.
             MyDevStack connects to it through the configured <code class="text-primary-400 font-mono">AWS_ENDPOINT</code>.
+            MyDevStack does not include an emulator — you start it separately.
           </p>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- FAQ -->
+  <section id="faq" class="py-20 bg-dark-surface/30 border-y border-dark-border">
+    <div class="max-w-4xl mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+      <div class="space-y-4">
+        <details class="bg-dark-surface border border-dark-border rounded-xl p-5 group">
+          <summary class="font-semibold cursor-pointer list-none flex items-center justify-between">
+            Is MyDevStack a read-only monitoring dashboard?
+            <span class="text-primary-400 transition-transform group-open:rotate-180">▾</span>
+          </summary>
+          <p class="text-sm text-dark-muted mt-3 leading-relaxed">
+            No. MyDevStack is a full CRUD control panel. You create, edit, and delete
+            resources across all 25+ supported AWS services directly from the UI. Most
+            service pages also include built-in usage examples for AWS CLI, JavaScript,
+            Python, and Go.
+          </p>
+        </details>
+        <details class="bg-dark-surface border border-dark-border rounded-xl p-5 group">
+          <summary class="font-semibold cursor-pointer list-none flex items-center justify-between">
+            Do I need an AWS account or real AWS credentials?
+            <span class="text-primary-400 transition-transform group-open:rotate-180">▾</span>
+          </summary>
+          <p class="text-sm text-dark-muted mt-3 leading-relaxed">
+            No. MyDevStack talks to a local AWS emulator such as LocalStack, FloCi, or
+            MiniStack. Any values you enter for AWS_ACCESS_KEY_ID and
+            AWS_SECRET_ACCESS_KEY are forwarded to the emulator; no real AWS account,
+            IAM user, or billing relationship is required.
+          </p>
+        </details>
+        <details class="bg-dark-surface border border-dark-border rounded-xl p-5 group">
+          <summary class="font-semibold cursor-pointer list-none flex items-center justify-between">
+            Does MyDevStack work offline?
+            <span class="text-primary-400 transition-transform group-open:rotate-180">▾</span>
+          </summary>
+          <p class="text-sm text-dark-muted mt-3 leading-relaxed">
+            Yes. Once the Docker container and your chosen local emulator are running,
+            everything works without internet access. The UI, the Go proxy, and the
+            emulator all stay on your machine.
+          </p>
+        </details>
+        <details class="bg-dark-surface border border-dark-border rounded-xl p-5 group">
+          <summary class="font-semibold cursor-pointer list-none flex items-center justify-between">
+            Does MyDevStack include an emulator?
+            <span class="text-primary-400 transition-transform group-open:rotate-180">▾</span>
+          </summary>
+          <p class="text-sm text-dark-muted mt-3 leading-relaxed">
+            No. MyDevStack is only the UI — a Vue frontend plus a Go proxy in one Docker
+            image. It ships no emulator and no AWS services. It connects to any
+            AWS-compatible endpoint you already run; LocalStack, FloCi, and MiniStack
+            are simply the endpoints it is most often pointed at.
+          </p>
+        </details>
+        <details class="bg-dark-surface border border-dark-border rounded-xl p-5 group">
+          <summary class="font-semibold cursor-pointer list-none flex items-center justify-between">
+            Is MyDevStack free and open source?
+            <span class="text-primary-400 transition-transform group-open:rotate-180">▾</span>
+          </summary>
+          <p class="text-sm text-dark-muted mt-3 leading-relaxed">
+            Yes. MyDevStack is released under the MIT license. The Docker image is
+            free, the source is public on GitHub, and there are no paid tiers, no
+            telemetry, and no usage limits.
+          </p>
+        </details>
+      </div>
+    </div>
+  </section>
+
   <!-- CTA -->
-  <section class="pb-20">
+  <section class="pb-20 pt-20">
     <div class="max-w-4xl mx-auto px-6 text-center">
       <a href="https://github.com/my-devstack/mydevstack" target="_blank" rel="noopener noreferrer"
          class="inline-flex items-center gap-3 px-8 py-4 bg-dark-surface border border-dark-border hover:border-primary-500/50 text-dark-text hover:text-primary-400 rounded-xl font-semibold transition-all text-lg">
@@ -636,12 +853,12 @@
         <h3 class="font-semibold mb-3 text-sm uppercase tracking-wider text-dark-muted">Disclaimer</h3>
         <p class="text-sm text-dark-muted leading-relaxed">
           MyDevStack is a development tool designed to enhance developer productivity by providing
-          a graphical interface for interacting with local AWS service emulators. It is not intended
-          to replace or serve as a substitute for the official AWS Management Console or any
-          production AWS services. This application is provided for development and testing purposes
-          only, and should not be used to manage production AWS infrastructure. Users are responsible
-          for ensuring compliance with AWS terms of service when using this tool alongside any AWS
-          environments.
+          a graphical control panel for interacting with local AWS service emulators. It is not
+          intended to replace or serve as a substitute for the official AWS Management Console or
+          any production AWS services. This application is provided for development and testing
+          purposes only, and should not be used to manage production AWS infrastructure. Users are
+          responsible for ensuring compliance with AWS terms of service when using this tool
+          alongside any AWS environments.
         </p>
       </div>
       <div class="flex items-center justify-center gap-6 text-sm text-dark-muted">
